@@ -27,7 +27,7 @@
   import * as _ from 'lodash';
   import AbstractCard from './AbstractCard.vue';
 
-  const pubmedBaseUrl = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils';
+  const pubmedBaseUrl = '//eutils.ncbi.nlm.nih.gov/entrez/eutils';
   export default {
     components: {
       'abstract-card': AbstractCard,
