@@ -30,7 +30,7 @@
 
   /* eslint no-underscore-dangle: 0 */
   export default {
-    name: 'abstract-card',
+    name: 'publication-card',
     props: ['abstract'],
     data() {
       return {

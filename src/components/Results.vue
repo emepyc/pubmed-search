@@ -14,7 +14,7 @@
           We have found <b>{{total}}</b> articles matching your query. Showing the first 20:
         </div>
         <div v-for="abstract in abstracts">
-          <abstract-card :abstract="abstract"></abstract-card>
+          <publication-card :abstract="abstract"></publication-card>
         </div>
 
       </div>
@@ -25,12 +25,12 @@
 <script>
   import axios from 'axios';
   import * as _ from 'lodash';
-  import AbstractCard from './AbstractCard.vue';
+  import PublicationCard from './PublicationCard';
 
   const pubmedBaseUrl = '//eutils.ncbi.nlm.nih.gov/entrez/eutils';
   export default {
     components: {
-      'abstract-card': AbstractCard,
+      'publication-card': PublicationCard,
     },
     data() {
       return {
