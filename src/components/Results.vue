@@ -1,7 +1,7 @@
 <template>
 
   <div> <!-- root -->
-    <div class="row justify-center sm-column">
+    <div class="publications-container row justify-center sm-column">
       <div class="spinner" v-show="abstracts.length === 0">
         <i class="fa fa-spinner fa-2x fa-spin"></i>
       </div>
@@ -82,6 +82,10 @@
 </script>
 
 <style lang="scss">
+  .publications-container {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
   .lighter-header {
     color: #777777;
   }
