@@ -1,6 +1,5 @@
-# Open Targets Search
+# Pubmed Search
 
-> Web interface to the open targets document repository search engine
 
 ## Build Setup
 
