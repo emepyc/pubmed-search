@@ -5,7 +5,7 @@
       <div class="spinner" v-show="abstracts.length === 0">
         <i class="fa fa-spinner fa-2x fa-spin"></i>
       </div>
-      <div class="col-8" v-show="abstracts.length>0">
+      <div class="width-2of3" v-show="abstracts.length>0">
         <div><a href="/">Back</a></div>
         <h2>
           <span class="lighter-header">Results for query</span> {{term}}
