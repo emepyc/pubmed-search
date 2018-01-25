@@ -1,7 +1,7 @@
 <template>
 
   <div> <!-- root -->
-    <div class="row justify-center">
+    <div class="row justify-center sm-column">
       <div class="spinner" v-show="abstracts.length === 0">
         <i class="fa fa-spinner fa-2x fa-spin"></i>
       </div>
