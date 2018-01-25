@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  import * as _ from 'lodash';
 
   /* eslint no-underscore-dangle: 0 */
   export default {
@@ -65,7 +66,7 @@
         return `${authorNames.slice(0, authorNames.length - 1).join(', ')} and ${authorNames[authorNames.length - 1]}`;
       },
       journal() {
-        return this.abstract.fulljournalname;
+        return _.unescape(this.abstract.fulljournalname);
       },
       year() {
         return new Date(this.abstract.pubdate).getFullYear();
