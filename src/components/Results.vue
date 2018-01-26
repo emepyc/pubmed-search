@@ -28,7 +28,7 @@
         <div v-for="abstract in abstracts">
           <publication-card :abstract="abstract"></publication-card>
         </div>
-        <div>
+        <div class="pagination">
           <button class="primary" :disabled="page === 0" @click="prevPage">Previous</button>
           <button class="primary" :disabled="page === ~~(total / 20)" @click="nextPage">Next</button>
         </div>
@@ -134,11 +134,16 @@
     margin-bottom: 20px;
   }
 
-  .back{
+  .back {
     margin-top: 10px;
   }
 
-  .spinner{
+  .spinner {
     margin-top: 50px;
+  }
+
+  .pagination {
+    margin-top: 20px;
+    margin-bottom: 30px;
   }
 </style>
