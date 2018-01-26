@@ -18,12 +18,12 @@
 
       <!-- Results -->
       <div class="width-2of3" v-show="abstracts.length>0">
-        <div><a href="/">Back</a></div>
+        <div class="back"><a href="/">Back</a></div>
         <h2>
           <span class="lighter-header">Results for query</span> {{term}}
         </h2>
         <div class="total-msg">
-          We have found <b>{{total}}</b> articles matching your query. Showing from {{(page * 20) + 1}} to {{((page * 20) + 20) > total ? total : (page * 20) + 20 }} out of {{total}} articles found
+          Records <b>{{(page * 20) + 1}}</b> to <b>{{((page * 20) + 20) > total ? total : (page * 20) + 20 }}</b> of <b>{{total}}</b>
         </div>
         <div v-for="abstract in abstracts">
           <publication-card :abstract="abstract"></publication-card>
@@ -84,33 +84,34 @@
         })
           .then(resp => {
             this.total = resp.data.esearchresult.count;
-            return
-            return axios.get(`${pubmedBaseUrl}/esummary.fcgi`, {
-              params: {
-                db: 'pubmed',
-                retmode: 'json',
-                id: resp.data.esearchresult.idlist.join(','),
-              },
-            });
+            return resp.data.esearchresult.idlist.join(',');
           })
-          .then(resp => {
-            console.log(resp);
-            if (resp.data.esummaryresult && resp.data.esummaryresult[0] === 'Empty id list - nothing todo') {
-              this.noResults = 1;
-              return;
+          .then(ids => {
+            if (ids.length) {
+              axios.get(`${pubmedBaseUrl}/esummary.fcgi`, {
+                params: {
+                  db: 'pubmed',
+                  retmode: 'json',
+                  id: ids,
+                },
+              })
+                .then(resp => {
+                  /* eslint no-param-reassign: 0 */
+                  // There is an entry called "uids" in the response
+                  // that doesn't correspond to an article.
+                  // but just the passed uids. I remove it from the response...
+                  delete resp.data.result.uids;
+                  this.abstracts = _.values(resp.data.result);
+                });
             }
-            /* eslint no-param-reassign: 0 */
-            // There is an entry called "uids" in the response that doesn't correspond to an article.
-            // but just the passed uids. I remove it from the response...
-            delete resp.data.result.uids;
-            this.abstracts = _.values(resp.data.result);
+            else {
+              this.noResults = 1;
+            }
           });
       },
     },
     watch: {
       page() {
-        console.log(`page is now... ${this.page}`);
-        this.term = this.$route.query.inputQuery;
         this.getRecords();
       },
     },
@@ -133,7 +134,11 @@
     margin-bottom: 20px;
   }
 
-  .spinner {
-    margin-top:50px;
+  .back{
+    margin-top: 10px;
+  }
+
+  .spinner{
+    margin-top: 50px;
   }
 </style>

@@ -4,7 +4,7 @@
     <!-- Search container -->
     <div class="search-container" @keyup.enter="doSearch">
       <div class="search-bar floating-label">
-        <input v-model="inputQuery" required class="full-width">
+        <input autofocus="true" v-model="inputQuery" required class="full-width">
         <label>Search for a term</label>
       </div>
 
