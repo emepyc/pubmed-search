@@ -2,22 +2,38 @@
 
   <div> <!-- root -->
     <div class="publications-container row justify-center sm-column">
-      <div class="spinner" v-show="abstracts.length === 0">
+
+      <!-- Spinner -->
+      <div class="spinner" v-show="abstracts.length === 0 && !noResults">
         <i class="fa fa-spinner fa-2x fa-spin"></i>
       </div>
+
+      <!-- No results message -->
+      <div v-show="noResults">
+        <h4>
+          <span class="lighter-header">No results matching your query</span> {{term}}
+        </h4>
+        <button class="primary" @click="$router.push('/')">Search again</button>
+      </div>
+
+      <!-- Results -->
       <div class="width-2of3" v-show="abstracts.length>0">
         <div><a href="/">Back</a></div>
         <h2>
           <span class="lighter-header">Results for query</span> {{term}}
         </h2>
         <div class="total-msg">
-          We have found <b>{{total}}</b> articles matching your query. Showing the first 20:
+          We have found <b>{{total}}</b> articles matching your query. Showing from {{(page * 20) + 1}} to {{((page * 20) + 20) > total ? total : (page * 20) + 20 }} out of {{total}} articles found
         </div>
         <div v-for="abstract in abstracts">
           <publication-card :abstract="abstract"></publication-card>
         </div>
-
+        <div>
+          <button class="primary" :disabled="page === 0" @click="prevPage">Previous</button>
+          <button class="primary" :disabled="page === ~~(total / 20)" @click="nextPage">Next</button>
+        </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -37,46 +53,69 @@
         query: '',
         term: '',
         total: 0,
+        page: 0,
         abstracts: [],
+        noResults: false,
       };
     },
+    methods: {
+      nextPage() {
+        this.page += 1;
+      },
+      prevPage() {
+        this.page -= 1;
+      },
+      getRecords() {
+        this.abstracts = [];
+        this.term = this.$route.query.inputQuery;
+
+        // Build the query with the pubmedBaseUrl + the term to search for
+        this.query = `${pubmedBaseUrl}${this.term}`;
+
+        // call pubmed with the term:
+        axios.get(`${pubmedBaseUrl}/esearch.fcgi`, {
+          params: {
+            db: 'pubmed',
+            retstart: this.page * 20,
+            retmax: 20,
+            retmode: 'json',
+            term: this.term,
+          },
+        })
+          .then(resp => {
+            this.total = resp.data.esearchresult.count;
+            return
+            return axios.get(`${pubmedBaseUrl}/esummary.fcgi`, {
+              params: {
+                db: 'pubmed',
+                retmode: 'json',
+                id: resp.data.esearchresult.idlist.join(','),
+              },
+            });
+          })
+          .then(resp => {
+            console.log(resp);
+            if (resp.data.esummaryresult && resp.data.esummaryresult[0] === 'Empty id list - nothing todo') {
+              this.noResults = 1;
+              return;
+            }
+            /* eslint no-param-reassign: 0 */
+            // There is an entry called "uids" in the response that doesn't correspond to an article.
+            // but just the passed uids. I remove it from the response...
+            delete resp.data.result.uids;
+            this.abstracts = _.values(resp.data.result);
+          });
+      },
+    },
     watch: {
-      // '$route.query.q'() {
-      //   console.log('route changed!');
-      // },
+      page() {
+        console.log(`page is now... ${this.page}`);
+        this.term = this.$route.query.inputQuery;
+        this.getRecords();
+      },
     },
     mounted() {
-      this.term = this.$route.query.inputQuery;
-
-      // Build the query with the pubmedBaseUrl + the term to search for
-      this.query = `${pubmedBaseUrl}${this.term}`;
-
-      // call pubmed with the term:
-      axios.get(`${pubmedBaseUrl}/esearch.fcgi`, {
-        params: {
-          db: 'pubmed',
-          retmax: 20,
-          retmode: 'json',
-          term: this.term,
-        },
-      })
-        .then(resp => {
-          this.total = resp.data.esearchresult.count;
-          return axios.get(`${pubmedBaseUrl}/esummary.fcgi`, {
-            params: {
-              db: 'pubmed',
-              retmode: 'json',
-              id: resp.data.esearchresult.idlist.join(','),
-            },
-          });
-        })
-        .then(resp => {
-          /* eslint no-param-reassign: 0 */
-          // There is an entry called "uids" in the response that doesn't correspond to an article.
-          // but just the passed uids. I remove it from the response...
-          delete resp.data.result.uids;
-          this.abstracts = _.values(resp.data.result);
-        });
+      this.getRecords();
     },
   };
 </script>
