@@ -45,7 +45,6 @@
       discardSearch() {
         // Changing the Vuex store...
         this.inputQuery = '';
-        this.removeAllFilters();
       },
     },
   };
